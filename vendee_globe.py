@@ -251,7 +251,7 @@ def load_web_data_2020():
     df = pd.DataFrame(rows)
     df['foil'] = df['Nombre de dérives'].str.contains('foil').astype(int)
     df = df.rename(columns={'skipper-name': 'skipper'})
-    
+
     return df
 
 
@@ -290,7 +290,8 @@ def load_web_data_2024():
 def data_prep_web(df, skipper_corrections=[]):
     """Data preparation of web data"""
 
-    df["skipper"] = df["first_name"].str.strip() + " " + df["last_name"].str.strip()
+    if "skipper" not in df:
+        df["skipper"] = df["first_name"].str.strip() + " " + df["last_name"].str.strip()
     for skipper1, skipper2 in skipper_corrections:
         df['skipper'] = df['skipper'].replace(skipper1, skipper2)
 
@@ -298,12 +299,13 @@ def data_prep_web(df, skipper_corrections=[]):
     for col in ['Longueur', 'Largeur', 'Tirant d\'eau', 'Déplacement (poids)',
                 'Hauteur mât', 'Surface de voiles au près', 'Surface de voiles au portant', 'Poids']:
 
-        df[col] = df[col].fillna('')
-        df[col] = df[col].str.extract('([\d,]+)')
-        df[col] = df[col].str.replace(',', '.')
-        df[col] = df[col].replace('', np.nan)
-        df[col] = df[col].replace('NC', np.nan)
-        df[col] = df[col].astype(float)
+        if col in df:
+            df[col] = df[col].fillna('')
+            df[col] = df[col].str.extract('([\d,]+)')
+            df[col] = df[col].str.replace(',', '.')
+            df[col] = df[col].replace('', np.nan)
+            df[col] = df[col].replace('NC', np.nan)
+            df[col] = df[col].astype(float)
 
     # cleaning
     df["Architecte"] = (df["Architecte"].
