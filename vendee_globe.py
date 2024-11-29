@@ -95,8 +95,9 @@ def update_data(data_folder, verbose=True):
             if os.path.exists(filename):
                 continue
 
+            url = f'https://www.vendeeglobe.org/sites/default/files/ranking/vendeeglobe_leaderboard_{date}.xlsx'
+
             try:
-                url = f'https://www.vendeeglobe.org/sites/default/files/ranking/vendeeglobe_leaderboard_{date}.xlsx'
                 r = requests.get(url)
                 if r.status_code == 200:
                     with open(filename, 'wb') as out_file:
@@ -169,8 +170,11 @@ def get_skippers(df, start, stop):
     return skippers
 
 
-def data_prep_race(df, skipper_corrections=[]):
+def data_prep_race(df, skipper_corrections=None):
     """"Data prep of race data"""
+
+    if skipper_corrections is None:
+        skipper_corrections = []
 
     # transform numeric columns
     for col in ['cap_30min', 'vitesse_30min', 'VMG_30min', 'distance_30min',
@@ -287,8 +291,11 @@ def load_web_data_2024():
 
     return pd.DataFrame(rows)
 
-def data_prep_web(df, skipper_corrections=[]):
+def data_prep_web(df, skipper_corrections=None):
     """Data preparation of web data"""
+
+    if skipper_corrections is None:
+        skipper_corrections = []
 
     if "skipper" not in df:
         df["skipper"] = df["first_name"].str.strip() + " " + df["last_name"].str.strip()
@@ -322,7 +329,7 @@ def load_wiki_data_2024():
     """Collection of of Wikipedia page"""
     var = pd.read_html("https://fr.wikipedia.org/wiki/Vend%C3%A9e_Globe_2024-2025")
     df_wiki = var[2]
-    df_wiki = df_wiki.set_axis(["genre", "skipper", "nationalité", "age", "participations",\
+    df_wiki = df_wiki.set_axis(["genre", "skipper", "nationalité", "age", "participations",
                                 "bateau", "appendices", "architecte", "chantier", "annee"],
                                axis=1)
 
@@ -436,7 +443,7 @@ def interact(df):
                                  description='Echelle :'
                                  )
 
-    widgets.interact(impact_foil_on_column, col=column, aggfunc=aggfunc, scale=scale, df=widgets.fixed(df));
+    widgets.interact(impact_foil_on_column, col=column, aggfunc=aggfunc, scale=scale, df=widgets.fixed(df))
 
 
 # Display ranking of top n skipper
@@ -466,7 +473,7 @@ def show_ranking(df, n=10):
     ax.yaxis.set_major_locator(MultipleLocator(1))
     ax.yaxis.set_inverted(True)
     ax.legend(bbox_to_anchor=(1.25, 1.0))
-    ax.set_title("Classements des 10 premiers au cours des 2 derniers jours");
+    ax.set_title("Classements des 10 premiers au cours des 2 derniers jours")
 
 
 # Visualisation de la distance parcourue par voilier et par jour
@@ -510,8 +517,6 @@ def show_race(df):
         # on affiche en plein où il en est
         else:
             n = ser.idxmin()
-            p = ax.plot(ser.iloc[[0, n]], [i, i], lw=2, ls=':', color=colors[skipper])
-            c = p[0].get_color()
             ax.plot(ser, [i] * len(ser), marker='^', lw=0, color=colors[skipper])
             ax.plot(ser.iloc[[0, -1]], [i, i], color=colors[skipper])
 
