@@ -424,7 +424,7 @@ def impact_foil_on_column(col, aggfunc, scale, df):
 # interaction
 def interact(df):
     # colonnes numériques
-    num_cols = [col for col in df.columns if is_numeric_dtype(df[col])]
+    num_cols = [col for col in df.columns if is_numeric_dtype(df[col]) and not np.allclose(df.groupby('skipper')[col].var().dropna(), 0)]
 
     # dropdown columns
     column = widgets.Dropdown(options=num_cols,
