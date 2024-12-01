@@ -547,13 +547,16 @@ def show_globe(df, start, stop, projection='orthographic'):
            .astype({"rang": str})
            )
 
-    last_skipers = df2.groupby('skipper')['date'].max()
-    ret_skippers = last_skipers.loc[last_skipers != df2['date'].max()].index
+    last_skippers = df2.groupby('skipper')['date'].max()
+    ret_skippers = last_skippers.loc[last_skippers != df2['date'].max()].index
     df2.loc[df2.skipper.isin(ret_skippers), "rang"] = "abandon"
 
     fig = px.line_geo(df2, lat='latitude', lon='longitude', hover_name="skipper",
                         hover_data={'skipper': False, 'voilier': True, 'rang': True},
                         color='skipper', projection=projection)
+
+    fig.update_geos(
+        projection=dict(rotation=dict(lat=df2['latitude'].iloc[0], lon=df2['longitude'].iloc[0])))
 
     fig.update_layout(showlegend = True,
                         height=500,
