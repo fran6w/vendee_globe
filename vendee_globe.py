@@ -83,7 +83,7 @@ def update_data(data_folder, verbose=True):
     if last_date.year < datetime.datetime.today().year - 1:
         dates = []
     else:
-        dates = pd.date_range(last_date, datetime.datetime.today().strftime("%d/%m/%Y"), freq="1D")
+        dates = pd.date_range(last_date, datetime.datetime.today(), freq="1D")
 
     flag = False
 
@@ -423,7 +423,7 @@ def impact_foil_on_column(col, aggfunc, scale, df):
 
 # interaction
 def interact(df):
-    # colonnes numériques
+    # colonnes numériques avec variance
     num_cols = [col for col in df.columns if is_numeric_dtype(df[col]) and not np.allclose(df.groupby('skipper')[col].var().dropna(), 0)]
 
     # dropdown columns
