@@ -1,5 +1,8 @@
 # Vendée Globe
 
+## Notebook en ligne
+- https://yotta-conseil.fr/vendee_globe_2024_2025.html
+
 ## Données du Vendée Globe 2020-2021
 - Fichiers des classements : data_2020.zip, race_2020.parquet
 - Page et données du site web : Glossaire - Vendée Globe.htm, web_2020.parquet
