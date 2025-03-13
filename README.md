@@ -1,5 +1,15 @@
 # Vendée Globe
 
+## Installer UV
+
+installez uv avec : 
+`curl -LsSf https://astral.sh/uv/install.sh | sh`
+
+puis :  `uv sync`
+
+enfn, activez votre environnement avec : `source .venv/bin/activate`
+
+
 ## Notebook en ligne
 - https://yotta-conseil.fr/vendee_globe_2024_2025.html
 
