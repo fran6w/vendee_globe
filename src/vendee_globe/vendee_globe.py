@@ -656,3 +656,63 @@ def show_speed(df):
     fig.update_traces(marker_line_width=0)
     fig.update_layout(title=dict(text="Vitesse moyenne des voiliers"))
     return fig
+
+def impact_foil_on_column(df, col, aggfunc, scale):
+
+    # cas où col = scale = DTF => pas de graphique
+    if col == scale == 'DTF':
+        print('pas de graphique')
+        return None
+
+    # selection et tri
+    tab = df[[scale, 'foil', col]].sort_values(scale)
+    tab["foil"] = tab["foil"].map({1: "avec", 0: "sans"})
+
+    # DTF arrondies aux centaines pour calculer les moyennes
+    if scale == 'DTF':
+        tab[scale] = tab[scale].apply(lambda x: round(x, -2))
+
+    # 1. groupby
+    tab = tab.groupby([scale, 'foil'])
+    # 2. aggfunc
+    if aggfunc == 'count':
+        tab = tab.count()
+    elif aggfunc == 'mean':
+        tab = tab.mean()
+    elif aggfunc == 'std':
+        tab = tab.std()
+    elif aggfunc == 'min':
+        tab = tab.min()
+    elif aggfunc == '25%':
+        tab = tab.quantile(.25)
+    elif aggfunc == '50%':
+        tab = tab.median()
+    elif aggfunc == '75%':
+        tab = tab.quantile(.75)
+    elif aggfunc == 'max':
+        tab = tab.max()
+    else:
+        raise(f'Unknown aggfunc: {aggfunc}')
+    # 3. reshape
+    tab = tab.unstack().droplevel(0, axis=1)
+
+    # plot
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.set_title(f'Impact du foil sur la colonne "{col}" ({aggfunc})')
+    ax.set_xlabel(scale)
+    ax.set_ylabel(f'{col} ({aggfunc})')
+
+    dates = tab.index
+    flag = tab['avec'] >= tab['sans']
+
+    ax.plot(dates, tab['avec'], label='avec foil')
+    ax.plot(dates, tab['sans'], label='sans foil')
+    ax.fill_between(dates, tab['avec'], tab['sans'], flag, alpha=0.5)
+    ax.fill_between(dates, tab['sans'], tab['avec'], ~flag, alpha=0.5)
+    ax.legend()
+
+    # axe des x
+    if scale == 'date':
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+    else:
+        ax.invert_xaxis()
